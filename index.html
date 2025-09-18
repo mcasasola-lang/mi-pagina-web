@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galería de productos</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    /* Fuerza que todas las imágenes tengan el mismo tamaño */
+    .card-img-top {
+      height: 200px;
+      object-fit: cover;
+    }
+
+    /* Fondo dinámico animado */
+    body.dynamic-bg {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(-45deg, #f3c7b6, #ffffff, #ffedca, #e2e2e2);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      transition: background 0.5s ease;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+  </style>
+</head>
+<body class="dynamic-bg">
+
+  <div class="container py-4">
+    <h1 class="text-center mb-4 text-black fw-bold display-5">Galería de Productos</h1>
+
+
+    <!-- Input y botón para agregar imágenes -->
+    <div class="mb-4 d-flex">
+      <input type="text" id="inputImagen" class="form-control me-2" placeholder="Ingresa la URL de la imagen">
+      <button id="btnAgregar" class="btn btn-success">Agregar Imagen</button>
+    </div>
+
+    <!-- Contenedor de la galería -->
+    <div id="galeria" class="row g-4">
+      <!-- Producto 1 -->
+      <div class="col-md-4">
+        <div class="card h-100" id="producto1">
+          <img src="Pay de limón.png" class="card-img-top" alt="Producto A">
+          <div class="card-body">
+            <h5 class="card-title">Pay de limón</h5>
+            <p class="card-text" id="texto1">Precio: $250</p>
+            <button class="btn btn-primary me-2" id="btnSelect1">Seleccionar</button>
+            <button class="btn btn-danger me-2" id="btnRemove1">Quitar</button>
+            <button class="btn btn-success agregar" data-nombre="Pay de limón" data-precio="250">Agregar al carrito</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Producto 2 -->
+      <div class="col-md-4">
+        <div class="card h-100" id="producto2">
+          <img src="Pastel de chocolate.png" class="card-img-top" alt="Producto B">
+          <div class="card-body">
+            <h5 class="card-title">Pastel de chocolate</h5>
+            <p class="card-text" id="texto2">Precio: $389</p>
+            <button class="btn btn-primary me-2" id="btnSelect2">Seleccionar</button>
+            <button class="btn btn-danger me-2" id="btnRemove2">Quitar</button>
+            <button class="btn btn-success agregar" data-nombre="Pastel de chocolate" data-precio="389">Agregar al carrito</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Producto 3 -->
+      <div class="col-md-4">
+        <div class="card h-100" id="producto3">
+          <img src="Pay de zarzamora.png" class="card-img-top" alt="Producto C">
+          <div class="card-body">
+            <h5 class="card-title">Pay de zarzamora</h5>
+            <p class="card-text" id="texto3">Precio: $250</p>
+            <button class="btn btn-primary me-2" id="btnSelect3">Seleccionar</button>
+            <button class="btn btn-danger me-2" id="btnRemove3">Quitar</button>
+            <button class="btn btn-success agregar" data-nombre="Pay de zarzamora" data-precio="250">Agregar al carrito</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Carrito -->
+    <div class="mt-5 p-4 bg-white rounded shadow">
+      <h2 class="mb-3">🛒 Carrito de Compras</h2>
+      <ul id="listaCarrito" class="list-group mb-3"></ul>
+      <h4>Total: $<span id="total">0</span></h4>
+      <button id="vaciarCarrito" class="btn btn-danger mt-2">Vaciar carrito</button>
+    </div>
+
+    <!-- Lista de tareas -->
+    <div class="mt-5 p-4 bg-white rounded shadow">
+      <h2 class="text-center">Lista de Tareas</h2>
+      <ul id="listaTareas" class="list-group mb-3">
+        <li id="tarea1" class="list-group-item">Comprar ingredientes</li>
+        <li id="tarea2" class="list-group-item">Entregar pedido</li>
+        <li id="tarea3" class="list-group-item">Adornar pastel</li>
+      </ul>
+
+      <button id="btnEliminar" class="btn btn-danger mb-3">Eliminar primera tarea</button>
+
+      <div class="d-flex">
+        <input type="text" id="nuevaTarea" class="form-control me-2" placeholder="Escribe una nueva tarea">
+        <button id="btnAgregarTarea" class="btn btn-primary">Agregar tarea</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // --- Fondo dinámico ---
+    const colorFondo = document.getElementById('colorFondo');
+    colorFondo.addEventListener('input', () => {
+      document.body.style.background = `linear-gradient(-45deg, ${colorFondo.value}, #C850C0, #FFCC70, #0093E9)`;
+      document.body.style.backgroundSize = "400% 400%";
+      document.body.style.animation = "gradientBG 15s ease infinite";
+    });
+
+    // --- Manejo de productos en la galería ---
+    function manejarProducto(num) {
+      const btnSelect = document.getElementById(`btnSelect${num}`);
+      const btnRemove = document.getElementById(`btnRemove${num}`);
+      const card = document.getElementById(`producto${num}`);
+
+      btnSelect.addEventListener("click", function() {
+        card.classList.toggle("border");
+        card.classList.toggle("border-success");
+        card.classList.toggle("shadow");
+      });
+
+      btnRemove.addEventListener("click", function() {
+        card.remove();
+      });
+    }
+
+    manejarProducto(1);
+    manejarProducto(2);
+    manejarProducto(3);
+
+    // Agregar nuevas imágenes dinámicamente
+    const btnAgregar = document.getElementById('btnAgregar');
+    const inputImagen = document.getElementById('inputImagen');
+    const galeria = document.getElementById('galeria');
+    let contador = 3;
+
+    btnAgregar.addEventListener('click', () => {
+      const url = inputImagen.value.trim();
+      if(url) {
+        contador++;
+        const col = document.createElement('div');
+        col.className = 'col-md-4';
+        col.innerHTML = `
+          <div class="card h-100" id="producto${contador}">
+            <img src="${url}" class="card-img-top" alt="Producto ${contador}">
+            <div class="card-body">
+              <h5 class="card-title">Producto ${contador}</h5>
+              <p class="card-text" id="texto${contador}">Precio: $0</p>
+              <button class="btn btn-primary me-2" id="btnSelect${contador}">Seleccionar</button>
+              <button class="btn btn-danger me-2" id="btnRemove${contador}">Quitar</button>
+              <button class="btn btn-success agregar" data-nombre="Producto ${contador}" data-precio="0">Agregar al carrito</button>
+            </div>
+          </div>
+        `;
+        galeria.appendChild(col);
+        manejarProducto(contador);
+        inputImagen.value = '';
+
+        // Activar botón de carrito para nuevos productos
+        activarBotonesCarrito();
+      }
+    });
+
+    // --- Carrito de Compras ---
+    const listaCarrito = document.getElementById("listaCarrito");
+    const totalEl = document.getElementById("total");
+    const vaciarBtn = document.getElementById("vaciarCarrito");
+    let total = 0;
+
+    function activarBotonesCarrito() {
+      const botones = document.querySelectorAll(".agregar");
+      botones.forEach(boton => {
+        boton.onclick = () => {
+          const nombre = boton.dataset.nombre;
+          const precio = parseFloat(boton.dataset.precio);
+
+          const li = document.createElement("li");
+          li.className = "list-group-item d-flex justify-content-between align-items-center";
+          li.innerHTML = `${nombre} - $${precio} 
+            <button class="btn btn-sm btn-danger eliminar">X</button>`;
+
+          li.querySelector(".eliminar").addEventListener("click", () => {
+            li.remove();
+            total -= precio;
+            totalEl.textContent = total.toFixed(2);
+          });
+
+          listaCarrito.appendChild(li);
+          total += precio;
+          totalEl.textContent = total.toFixed(2);
+        };
+      });
+    }
+
+    activarBotonesCarrito();
+
+    vaciarBtn.addEventListener("click", () => {
+      listaCarrito.innerHTML = "";
+      total = 0;
+      totalEl.textContent = total.toFixed(2);
+    });
+
+    // --- Lista de tareas ---
+    const btnEliminar = document.getElementById('btnEliminar');
+    const listaTareas = document.getElementById('listaTareas');
+    const nuevaTareaInput = document.getElementById('nuevaTarea');
+    const btnAgregarTarea = document.getElementById('btnAgregarTarea');
+
+    btnEliminar.addEventListener("click", () => {
+      const primerElemento = listaTareas.querySelector("li");
+      if(primerElemento) {
+        primerElemento.remove();
+      }
+    });
+
+    btnAgregarTarea.addEventListener("click", () => {
+      const texto = nuevaTareaInput.value.trim();
+      if(texto) {
+        const nuevoLi = document.createElement("li");
+        nuevoLi.className = "list-group-item";
+        nuevoLi.textContent = texto;
+        listaTareas.appendChild(nuevoLi);
+        nuevaTareaInput.value = "";
+      }
+    });
+  </script>
+</body>
+</html>
